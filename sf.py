@@ -58,7 +58,7 @@ from sfwebui import SpiderFootWebUi
 # These can be overriden on a per-module basis, and some will
 # be overridden from saved configuration settings stored in the DB.
 sfConfig = {
-    '_debug': False,  # Debug
+    '_debug': True,  # Debug
     '__blocknotif': False,  # Block notifications
     '_useragent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0',  # User-Agent to use for HTTP requests
     '_dnsserver': '',  # Override the default resolver
@@ -66,7 +66,7 @@ sfConfig = {
     '_internettlds': 'https://publicsuffix.org/list/effective_tld_names.dat',
     '_internettlds_cache': 72,
     '__database': 'spiderfoot.db',
-    '__webaddr': '127.0.0.1',
+    '__webaddr': '0.0.0.0',
     '__webport': 5001,
     '__docroot': '',  # don't put trailing /
     '__modules__': None,  # List of modules. Will be set after start-up.
