@@ -13,7 +13,7 @@
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
 
-class sfp_googlesearch(SpiderFootPlugin):
+class sfp_subdomaingoogle(SpiderFootPlugin):
     """Google:Footprint,Investigate,Passive:Search Engines:errorprone:Some light Google scraping to identify sub-domains."""
 
     # Default options
@@ -38,7 +38,7 @@ class sfp_googlesearch(SpiderFootPlugin):
 
     # What events is this module interested in for input
     def watchedEvents(self):
-        return ["DOMAIN"]
+        return ["DOMAIN_NAME"]
 
     # What events this module produces
     # This is to support the end user in selecting modules based on events
@@ -86,16 +86,16 @@ class sfp_googlesearch(SpiderFootPlugin):
                     self.results.append(link)
                 self.sf.debug("Found a link: " + link)
                 if self.sf.urlFQDN(link).endswith(eventData):
-                    found = True
+                    #found = True
                     evt = SpiderFootEvent("LINKED_URL_INTERNAL", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
 
-            if found:
+           ''' if found:
                 # Submit the google results for analysis
                 evt = SpiderFootEvent("SEARCH_ENGINE_WEB_CONTENT", pages[page],
                                       self.__name__, event)
                 self.notifyListeners(evt)
-
+'''
 
 # End of sfp_googlesearch class
