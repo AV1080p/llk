@@ -519,9 +519,7 @@ class SpiderFoot:
 
         regexToType = {
             "^\d+\.\d+\.\d+\.\d+$": "IP_ADDRESS",
-            "^\d+\.\d+\.\d+\.\d+/\d+$": "NETBLOCK_OWNER",
-            "^.[a-zA-Z\-0-9\.]+$": "INTERNET_NAME",
-            "^.*@.*$": "EMAILADDR"
+            "^.[a-zA-Z\-0-9\.]+$": "DOMAIN_NAME",
         }
 
         # Parse the target and set the targetType
@@ -1477,8 +1475,7 @@ class SpiderFootPlugin(object):
 
 # Class for targets
 class SpiderFootTarget(object):
-    _validTypes = ["IP_ADDRESS", "NETBLOCK_OWNER", "INTERNET_NAME",
-                   "EMAILADDR" ]
+    _validTypes = ["IP_ADDRESS", "DOMAIN_NAME"]
     targetType = None
     targetValue = None
     targetAliases = list()
@@ -1524,8 +1521,8 @@ class SpiderFootTarget(object):
 
     # Get all domains associated with the target
     def getNames(self):
-        e = self._getEquivalents("INTERNET_NAME")
-        if self.targetType == "INTERNET_NAME":
+        e = self._getEquivalents("DOMAIN_NAME")
+        if self.targetType == "DOMAIN_NAME":
             e.append(self.targetValue.lower())
         return e
 

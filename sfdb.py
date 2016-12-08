@@ -87,6 +87,8 @@ class SpiderFootDb:
         "CREATE INDEX idx_scan_results_srchash ON tbl_scan_results (scan_instance_id, source_event_hash)",
         "CREATE INDEX idx_scan_logs ON tbl_scan_log (scan_instance_id)",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('SUBDOMAIN', 'sub domain', 0, 'ENTITY')"
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DOMAIN_NAME', 'domain name', 0, 'ENTITY')"
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('IP_ADDRESS', 'domain name', 0, 'ENTITY')"
     ]
 
     def __init__(self, opts):
