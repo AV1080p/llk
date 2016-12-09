@@ -90,8 +90,8 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
                     evt = SpiderFootEvent("LINKED_URL_INTERNAL", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
-
-           ''' if found:
+'''
+                if found:
                 # Submit the google results for analysis
                 evt = SpiderFootEvent("SEARCH_ENGINE_WEB_CONTENT", pages[page],
                                       self.__name__, event)
