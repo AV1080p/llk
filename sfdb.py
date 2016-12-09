@@ -189,7 +189,7 @@ class SpiderFootDb:
 
     # Get event types
     def eventTypes(self):
-        qry = "SELECT event, event_descr, event_raw, event_type FROM tbl_event_types"
+        qry = "SELECT event_descr, event, event_raw, event_type FROM tbl_event_types"
         try:
             self.dbh.execute(qry)
             return self.dbh.fetchall()
