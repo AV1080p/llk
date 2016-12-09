@@ -88,7 +88,7 @@ class SpiderFootDb:
         "CREATE INDEX idx_scan_logs ON tbl_scan_log (scan_instance_id)",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('SUBDOMAIN', 'sub domain', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DOMAIN_NAME', 'domain name', 0, 'ENTITY')",
-        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('IP_ADDRESS', 'domain name', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('IP_ADDRESS', 'ip address', 0, 'ENTITY')",
     ]
 
     def __init__(self, opts):
@@ -189,7 +189,7 @@ class SpiderFootDb:
 
     # Get event types
     def eventTypes(self):
-        qry = "SELECT event_descr, event, event_raw, event_type FROM tbl_event_types"
+        qry = "SELECT event, event_descr, event_raw, event_type FROM tbl_event_types"
         try:
             self.dbh.execute(qry)
             return self.dbh.fetchall()
