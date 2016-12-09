@@ -14,7 +14,7 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
 
 class sfp_subdomaingoogle(SpiderFootPlugin):
-    """Google:Footprint,Investigate,Passive:Search Engines:errorprone:Some light Google scraping to identify sub-domains."""
+    """SubDomainGoogle:Footprint,Investigate,Passive:Search Engines:errorprone:Some light Google scraping to identify sub-domains."""
 
     # Default options
     opts = {
@@ -87,7 +87,7 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
                 self.sf.debug("Found a link: " + link)
                 if self.sf.urlFQDN(link).endswith(eventData):
                     #found = True
-                    evt = SpiderFootEvent("LINKED_URL_INTERNAL", link,
+                    evt = SpiderFootEvent("SUBDOMAIN", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
 '''
