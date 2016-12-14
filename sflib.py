@@ -1049,7 +1049,8 @@ class SpiderFoot:
         pat = re.compile("(\/search\S+start=\d+.[^\'\"]*sa=N)", re.IGNORECASE)
         matches = re.findall(pat, firstPage['content'])
 
-        while matches > 0 and fetches < limit:
+        #while matches > 0 and fetches < limit:
+        while matches > 0:
             nextUrl = None
             fetches += 1
             for match in matches:
@@ -1151,7 +1152,8 @@ class SpiderFoot:
         returnResults[seedUrl] = firstPage['content']
         pat = re.compile("(\/search\S+first=\d+.[^\'\"]*FORM=\S+)", re.IGNORECASE)
         matches = re.findall(pat, firstPage['content'])
-        while matches > 0 and fetches < limit:
+        #while matches > 0 and fetches < limit:
+        while matches > 0:
             nextUrl = None
             fetches += 1
             for match in matches:
@@ -1249,7 +1251,8 @@ class SpiderFoot:
         pat = re.compile("(\/search;\S+b=\d+.[^\'\"]*)", re.IGNORECASE)
         matches = re.findall(pat, firstPage['content'])
 
-        while matches > 0 and fetches < limit:
+        #while matches > 0 and fetches < limit:
+        while matches > 0:
             nextUrl = None
             fetches += 1
             for match in matches:
