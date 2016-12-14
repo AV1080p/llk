@@ -1159,8 +1159,9 @@ class SpiderFoot:
             #for match in matches:
                 # Bing moves in increments of 10
                 #if "first=" + str((fetches * 10) + 2) in match:
-            nextUrl = matches[0].replace("&amp;", "&").replace("%3a", ":").replace("first=","first="+str((fetches* 10) + 1)+"&")
-
+            #nextUrl = matches[0].replace("&amp;", "&").replace("%3a", ":").replace("first=","first="+str((fetches* 10) + 1))
+            nextUrl = u"/search?q={0}".format(searchString) + \
+                      u"&pc=MOZI&first="+str((fetches*10)+1)
             if nextUrl is None:
                 self.debug("Nothing left to scan for in Bing results.")
                 return returnResults
