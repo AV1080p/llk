@@ -4,7 +4,7 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
 
 class sfp_subdomain(SpiderFootPlugin):
-    """SubDomain:Investigate,Passive:Search Engines:errorprone:sub-domains 子域名去重复模块."""
+    """SubDomain:Investigate,Passive:Search Engines:errorprone:sub-domains distinct."""
 
     # Default options
     opts = {
