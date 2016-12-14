@@ -44,7 +44,7 @@ class sfp_subdomain(SpiderFootPlugin):
             return None
         else:
             self.results.append(eventData)
-            evt = SpiderFootEvent("SUBDOMAIN_ALL", link, self.__name__, event)
+            evt = SpiderFootEvent("SUBDOMAIN_ALL", eventData, self.__name__, event)
             self.notifyListeners(evt)
 '''
         # Sites hosted on the domain
