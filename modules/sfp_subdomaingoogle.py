@@ -83,7 +83,7 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
                 if link in self.results:
                     continue
                 else:
-                    link = self.sf.urlFQDN(link).endswith(eventData)
+                    link = self.sf.urlFQDN(link)
                     self.results.append(link)
                 #iself.sf.debug("Found a link: " + link)
                 if self.sf.urlFQDN(link).endswith(eventData):
