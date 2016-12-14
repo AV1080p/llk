@@ -1,14 +1,4 @@
 # -*- coding: utf-8 -*-
-# -------------------------------------------------------------------------------
-# Name:         sfp_googlesearch
-# Purpose:      Searches Google for content related to the domain in question.
-#
-# Author:      Steve Micallef <steve@binarypool.com>
-#
-# Created:     07/05/2012
-# Copyright:   (c) Steve Micallef 2012
-# Licence:     GPL
-# -------------------------------------------------------------------------------
 
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
@@ -38,13 +28,13 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
 
     # What events is this module interested in for input
     def watchedEvents(self):
-        return ["DOMAIN_NAME"]
+        return ["GOOGLE_SUBDOMAIN","BING_SUBDOMAIN"]
 
     # What events this module produces
     # This is to support the end user in selecting modules based on events
     # produced.
     def producedEvents(self):
-        return ["GOOGLE_SUBDOMAIN" ,"GOOGLE_URL"]
+        return ["SUBDOMAIN_ALL"]
 
     def handleEvent(self, event):
         eventName = event.eventType
@@ -52,11 +42,13 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
         eventData = event.data
 
         if eventData in self.results:
-            self.sf.debug("Already did a search for " + eventData + ", skipping.")
+            self.sf.debug("Already exist " + eventData + ", skipping.")
             return None
         else:
             self.results.append(eventData)
-
+            evt = SpiderFootEvent("SUBDOMAIN_ALL", link, self.__name__, event)
+            self.notifyListeners(evt)
+'''
         # Sites hosted on the domain
         pages = self.sf.googleIterate("site:" + eventData,
                                       dict(limit=self.opts['pages'], useragent=self.opts['_useragent'],
@@ -89,10 +81,10 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
                 if self.sf.urlFQDN(link).endswith(eventData):
                     #found = True
                     #self.sf.debug("Found a link: " + eventData)
-                    evt = SpiderFootEvent("GOOGLE_SUBDOMAIN", link,
+                    evt = SpiderFootEvent("SUBDOMAIN", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
-'''
+
                 if found:
                 # Submit the google results for analysis
                 evt = SpiderFootEvent("SEARCH_ENGINE_WEB_CONTENT", pages[page],

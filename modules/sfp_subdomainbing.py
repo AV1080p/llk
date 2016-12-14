@@ -43,7 +43,7 @@ class sfp_subdomainbing(SpiderFootPlugin):
     # This is to support the end user in selecting modules based on events
     # produced.
     def producedEvents(self):
-        return ["SUBDOMAIN"]
+        return ["BING_SUBDOMAIN","BING_URL"]
 
     def handleEvent(self, event):
         eventName = event.eventType
@@ -88,7 +88,7 @@ class sfp_subdomainbing(SpiderFootPlugin):
                     found = True
                     self.sf.debug("Found a link: " + link)
 
-                    evt = SpiderFootEvent("SUBDOMAIN", link,
+                    evt = SpiderFootEvent("BING_SUBDOMAIN", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
 '''

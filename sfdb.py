@@ -86,10 +86,14 @@ class SpiderFootDb:
         "CREATE INDEX idx_scan_results_hash ON tbl_scan_results (scan_instance_id, hash)",
         "CREATE INDEX idx_scan_results_srchash ON tbl_scan_results (scan_instance_id, source_event_hash)",
         "CREATE INDEX idx_scan_logs ON tbl_scan_log (scan_instance_id)",
-        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('SUBDOMAIN', 'sub domain', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('SUBDOMAIN_ALL', 'sub domain', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DOMAIN_NAME', 'domain name', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('IP_ADDRESS', 'ip address', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('URL_ALL', 'target url', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('GOOGLE_URL', 'google url', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('BING_URL', 'bing url', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('GOOGLE_SUBDOMAIN', 'google subdomain', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('BING_SUBDOMAIN', 'bing subdomain', 0, 'ENTITY')",
     ]
 
     def __init__(self, opts):
