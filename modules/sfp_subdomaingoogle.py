@@ -44,7 +44,7 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
     # This is to support the end user in selecting modules based on events
     # produced.
     def producedEvents(self):
-        return ["SUBDOMAIN"]
+        return ["SUBDOMAIN" ,"URL_ALL"]
 
     def handleEvent(self, event):
         eventName = event.eventType
@@ -83,10 +83,12 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
                 if link in self.results:
                     continue
                 else:
+                    link = self.sf.urlFQDN(link).endswith(eventData)
                     self.results.append(link)
-                self.sf.debug("Found a link: " + link)
+                #iself.sf.debug("Found a link: " + link)
                 if self.sf.urlFQDN(link).endswith(eventData):
                     #found = True
+                    #self.sf.debug("Found a link: " + eventData)
                     evt = SpiderFootEvent("SUBDOMAIN", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
