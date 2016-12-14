@@ -1156,10 +1156,10 @@ class SpiderFoot:
         while matches > 0:
             nextUrl = None
             fetches += 1
-            for match in matches:
+            #for match in matches:
                 # Bing moves in increments of 10
-                if "first=" + str((fetches * 10) + 1) in match:
-                    nextUrl = match.replace("&amp;", "&").replace("%3a", ":")
+                #if "first=" + str((fetches * 10) + 2) in match:
+            nextUrl = matches[0].replace("&amp;", "&").replace("%3a", ":").replace("first=","first="+str((fetches* 10) + 1)+"&")
 
             if nextUrl is None:
                 self.debug("Nothing left to scan for in Bing results.")
@@ -1230,7 +1230,7 @@ class SpiderFoot:
             firstPage = self.fetchUrl(seedUrl, timeout=opts['timeout'],
                                       useragent=opts['useragent'])
             if firstPage['code'] == 403:
-                self.error("Yahoo doesn't like us right now..", False)
+                self.error("403:Yahoo doesn't like us right now..", False)
                 failed = True
 
             if firstPage['content'] is None:
