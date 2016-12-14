@@ -3,17 +3,15 @@
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 
 
-class sfp_subdomaingoogle(SpiderFootPlugin):
-    """SubDomainGoogle:Footprint,Investigate,Passive:Search Engines:errorprone:Some light Google scraping to identify sub-domains."""
+class sfp_subdomain(SpiderFootPlugin):
+    """SubDomain:Investigate,Passive:Search Engines:errorprone:sub-domains 子域名去重复模块."""
 
     # Default options
     opts = {
-        'pages': 20  # Number of google results pages to iterate
     }
 
     # Option descriptions
     optdescs = {
-        'pages': "Number of Google results pages to iterate through."
     }
 
     # Target
