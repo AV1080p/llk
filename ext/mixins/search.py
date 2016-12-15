@@ -82,7 +82,7 @@ class GoogleWebMixin(object):
         resp = self.request('https://ipv4.google.com' + tree.xpath('//img/@src')[0], redirect=False, cookiejar=self.cookiejar, agent=self.user_agent)
         # store the captcha image to the file system
 
-        with tempfile.NamedTemporaryFile(suffix='.jpg') as fp:
+        with open('/tmp/111.jpg','w') as fp:
             fp.write(resp.raw)
             fp.flush()
             print(fp.name)
