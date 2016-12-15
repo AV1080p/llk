@@ -81,7 +81,7 @@ class GoogleWebMixin(object):
         print(captchaUrl)
         #resp = self.request('https://ipv4.google.com' + tree.xpath('//img/@src')[0], redirect=False, cookiejar=self.cookiejar, agent=self.user_agent)
         # store the captcha image to the file system
-'''
+
         with tempfile.NamedTemporaryFile(suffix='.jpg') as fp:
             fp.write(resp.raw)
             fp.flush()
@@ -89,7 +89,7 @@ class GoogleWebMixin(object):
             w = webbrowser.get()
             w.open('file://' + fp.name)
             self.alert(fp.name)
-'''
+
             _payload = {'captcha':raw_input('[CAPTCHA] Answer: ')}
             # temporary captcha file removed on close
         # extract the form elements for the capctah answer request
