@@ -11,6 +11,7 @@
 # -------------------------------------------------------------------------------
 
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
+from mixins.search import GoogleWebMixin
 
 
 class sfp_subdomaingoogle(SpiderFootPlugin):
@@ -18,12 +19,10 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
 
     # Default options
     opts = {
-        'pages': 20  # Number of google results pages to iterate
     }
 
     # Option descriptions
     optdescs = {
-        'pages': "Number of Google results pages to iterate through."
     }
 
     # Target
@@ -49,14 +48,43 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
     def handleEvent(self, event):
         eventName = event.eventType
         srcModuleName = event.module
-        eventData = event.data
+        domain = event.data
+        regmatch = re.compile('//([^/]*\.%s)' % (domain))
 
-        if eventData in self.results:
-            self.sf.debug("Already did a search for " + eventData + ", skipping.")
+        if domain in self.results:
+            self.sf.debug("Already did a search for " + domain + ", skipping.")
             return None
         else:
-            self.results.append(eventData)
+            self.results.append(domain)
 
+        base_query = 'site:' + domain
+        # control variables
+        page = 1
+        # execute search engine queries and scrape results storing subdomains in a list
+        # loop until no new subdomains are found
+        # build query based on results of previous results
+        query = ''
+        # send query to search engine
+        results = self.search_google_web(base_query + query, limit=0, start_page=page)
+        # extract hosts from search results
+        sites = []
+        for link in results:
+            site = regmatch.search(link)
+            if site is not None:
+                sites.append(site.group(1))
+            # create a unique list
+        sites = list(set(sites))
+        # add subdomain to list if not already exists
+        for site in sites:
+            if site not in self.results:
+                self.results.append(site)
+                self.sf.debug("Found a link: " + site)
+                evt = SpiderFootEvent("GOOGLE_SUBDOMAIN", site, self.__name__, event)
+                elf.notifyListeners(evt)
+       
+
+
+'''
         # Sites hosted on the domain
         pages = self.sf.googleIterate("site:" + eventData,
                                       dict(limit=self.opts['pages'], useragent=self.opts['_useragent'],
@@ -92,6 +120,7 @@ class sfp_subdomaingoogle(SpiderFootPlugin):
                     evt = SpiderFootEvent("GOOGLE_SUBDOMAIN", link,
                                           self.__name__, event)
                     self.notifyListeners(evt)
+'''
 '''
                 if found:
                 # Submit the google results for analysis
