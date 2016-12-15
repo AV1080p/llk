@@ -11,7 +11,7 @@
 # -------------------------------------------------------------------------------
 
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
-from mixins.search import GoogleWebMixin
+from ext.mixins.search import GoogleWebMixin
 import urllib
 import re
 
