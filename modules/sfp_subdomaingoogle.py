@@ -12,7 +12,8 @@
 
 from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 from mixins.search import GoogleWebMixin
-
+import urllib
+import re
 
 class sfp_subdomaingoogle(SpiderFootPlugin):
     """SubDomainGoogle:Footprint,Investigate,Passive:Search Engines:errorprone:Some light Google scraping to identify sub-domains."""
