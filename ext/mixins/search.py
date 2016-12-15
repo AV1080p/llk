@@ -19,7 +19,7 @@ class GoogleWebMixin(object):
         request.timeout = timeout or self._global_options['timeout']
         request.redirect = redirect
         return request.send(url, method=method, payload=payload, headers=headers, cookiejar=cookiejar, auth=auth, content=content)
-        
+
     def search_google_web(self, query, limit=0, start_page=1):
         # parsing logic based on https://github.com/maurosoria/s3arch
         url = 'https://www.google.com/search'
@@ -28,7 +28,7 @@ class GoogleWebMixin(object):
         set_page = lambda x: (x - 1) * num
         payload = {'q':query, 'start':set_page(page), 'num':num, 'complete':0}
         results = []
-        self.verbose('Searching Google for: %s' % (query))
+        #self.verbose('Searching Google for: %s' % (query))
         while True:
             #resp = None
             # google errors out at > 2061 characters not including the protocol
@@ -56,7 +56,7 @@ class GoogleWebMixin(object):
                 continue
             # handle error conditions
             if resp.status_code != 200:
-                self.error('Google encountered an unknown error.')
+                #self.error('Google encountered an unknown error.')
                 break
             tree = fromstring(resp.text)
             links = tree.xpath('//a/@href')
