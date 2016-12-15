@@ -81,7 +81,7 @@ class sfp_subdomaingoogle(SpiderFootPlugin, GoogleWebMixin):
                 self.results.append(site)
                 self.sf.debug("Found a link: " + site)
                 evt = SpiderFootEvent("GOOGLE_SUBDOMAIN", site, self.__name__, event)
-                elf.notifyListeners(evt)
+                self.notifyListeners(evt)
        
 
 
