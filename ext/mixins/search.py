@@ -5,7 +5,7 @@ import re
 import tempfile
 import urllib
 import webbrowser
-from recon.utils.requests import Request
+from ext.mixins.requests import Request
 
 class GoogleWebMixin(object):
 
