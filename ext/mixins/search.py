@@ -5,6 +5,7 @@ import re
 import tempfile
 import urllib
 import webbrowser
+from recon.utils.requests import Request
 
 class GoogleWebMixin(object):
 
@@ -13,10 +14,8 @@ class GoogleWebMixin(object):
 
     def request(self, url, method='GET', timeout=None, payload=None, headers=None, cookiejar=None, auth=None, content='', redirect=True, agent=None):
         request = Request()
-        request.user_agent = agent or self._global_options['user-agent']
-        request.debug = True if self._global_options['verbosity'] >= 2 else False
-        request.proxy = self._global_options['proxy']
-        request.timeout = timeout or self._global_options['timeout']
+        request.user_agent = agent 
+        request.timeout = 10
         request.redirect = redirect
         return request.send(url, method=method, payload=payload, headers=headers, cookiejar=cookiejar, auth=auth, content=content)
 
