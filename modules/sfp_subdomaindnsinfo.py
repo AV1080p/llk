@@ -14,6 +14,7 @@ from sflib import SpiderFoot, SpiderFootPlugin, SpiderFootEvent
 from ext.dnsinfo.flint import FlintClient
 import urllib
 import re
+import sys
 
 class sfp_subdomaindnsinfo(SpiderFootPlugin):
     """SubDomainDnsInfo:Footprint,Investigate,Passive:Web Interface:errorprone:DNSinfo web interface scraping to identify sub-domains."""
