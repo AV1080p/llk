@@ -74,7 +74,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
             self.results.append(domain)
 
         f_keyword = '*.' + domain
-        resultsDomainIp = flint("rrset", f_keyword, "A")
+        resultsDomainIp = self.flint("rrset", f_keyword, "A")
         for domainiplist in resultsDomainIp:
             for domainip in domainiplist.split("\n"):
                 domainTemp = domainip.split("|A|")[0]
