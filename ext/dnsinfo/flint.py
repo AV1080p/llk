@@ -211,7 +211,7 @@ class FlintClient(object):
                 for rd in rdata:
                     if not plain:
                         s.write("%s|%s|%s\n" %(r['rrname'], r['rrtype'], rd))
-                        print r['rrname']
+                        #print r['rrname']
             s.seek(0)
             return s.read().strip()
 
@@ -234,7 +234,9 @@ class FlintClient(object):
                 if jsond:
                     print json.dumps(data, sort_keys=False, indent=4, separators=(',', ': '))
                 else:
-                    resultsData.append(_dump_spiderfoot(rrname, rrtype, data))
+                    tempResult = _dump_spiderfoot(rrname, rrtype, data)
+                    print tempResult
+                    resultsData.append(tempResult)
             if not next:
                 break
             if count >= limit:
