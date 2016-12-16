@@ -15,6 +15,7 @@ except ImportError:
     import simplejson as json
 import traceback
 
+'''
 __VERSION__ = "0.1.9"
 
 __AUTHOR__ = "passivedns@360.cn" # All original credit to passivedns@360.cn. Fork changes by x123@users.noreply.github.com
@@ -52,7 +53,7 @@ FLINT_TYPES = {
         "NSEC3" : 50
 }
 
-
+'''
 class FlintClient(object):
 
     TIMEOUT = 30
@@ -136,9 +137,10 @@ class FlintClient(object):
             path = "%srtype/%s/" %(path, FLINT_TYPES[f_type])
         if f_netmask is not None:
             path = "%smask/%s/" %(path, str(f_netmask))
+'''
         if options.source:
             path = "%ssource/%s/"%(path, str(options.source))
-
+'''
         if self.api.startswith("http://"):
             url = "%s%s" %(self.api, path)
         else:
@@ -347,14 +349,10 @@ class FlintClient(object):
         m = hashlib.md5()
         m.update(str)
         return m.hexdigest()
-
+'''
     def parse_config():
         config = {}
         cfg_files = ["./ext/dnsinfo/flint.conf"]
-
-        if not cfg_files:
-            raise Exception("No config file found")
-
         try:
             for fname in cfg_files:
                 for line in open(fname):
@@ -371,6 +369,7 @@ class FlintClient(object):
             raise Exception("Config file '%s' parse error", cfg_fname)
 
         return config
+'''
 
 '''
 def runStart(f_table, f_keyword, f_type):
