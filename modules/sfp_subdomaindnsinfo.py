@@ -74,7 +74,8 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
             self.results.append(domain)
 
         f_keyword = '*.' + domain
-        resultsDomainIp = self.flint("rrset", f_keyword, "A")
+        self.flint("rrset", f_keyword, "A")
+        resultsDomainIp = self.flint.getresultsData()
         if not resultsDomainIp:
             self.sf.debug("resultsDomainIp empty!")
             return None

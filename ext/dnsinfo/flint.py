@@ -65,9 +65,13 @@ class FlintClient(object):
         self.api_id = api_id
         self.api_key = api_key
         self.verbose = verbose
+        self.resultsData = list()
 
     def __call__(self, f_table, f_keyword, f_type, *args):
         getattr(self, f_table)(f_keyword, f_type, *args)
+        
+    def getresultsData(self):
+        return self.resultsData
 
     def _do_query(self, req, max_retry=0):
         def _safe_in_query(req):
@@ -177,7 +181,7 @@ class FlintClient(object):
 
     def rrset(self, rrname, rrtype=None, sort="time_last", reverse=False,
                 limit=1000, jsond=False, plain=False, after=None, before=None):
-        resultsData = list()
+       #resultsData = list()
 
         def _dump(rrname, rrtype, data):
             s = StringIO()
@@ -236,15 +240,15 @@ class FlintClient(object):
                 else:
                     tempResult = _dump_spiderfoot(rrname, rrtype, data)
                     for tt in tempResult.split("\n"):
-                        resultsData.append(tt)
+                        self.resultsData.append(tt)
             if not next:
                 break
             if count >= limit:
                 break
             resp, data = self.next_query(next)
-        for tt in resultsData:
-            print tt
-        return resultsData
+        #for tt in resultsData:
+        #    print tt
+        #return resultsData
 
     def rdata(self, rdata, rrtype=None, limit=1000, jsond=False, plain=False):
 
