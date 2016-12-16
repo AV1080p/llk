@@ -211,6 +211,7 @@ class FlintClient(object):
                 for rd in rdata:
                     if not plain:
                         s.write("%s|%s|%s\n" %(r['rrname'], r['rrtype'], rd))
+                        print r['rrname']
             s.seek(0)
             return s.read().strip()
 
