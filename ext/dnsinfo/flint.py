@@ -235,13 +235,15 @@ class FlintClient(object):
                     print json.dumps(data, sort_keys=False, indent=4, separators=(',', ': '))
                 else:
                     tempResult = _dump_spiderfoot(rrname, rrtype, data)
-                    print tempResult
-                    resultsData.append(tempResult)
+                    for tt in tempResult.split("\n"):
+                        resultsData.append(tt)
             if not next:
                 break
             if count >= limit:
                 break
             resp, data = self.next_query(next)
+        for tt in resultsData:
+            print tt
         return resultsData
 
     def rdata(self, rdata, rrtype=None, limit=1000, jsond=False, plain=False):

@@ -79,20 +79,19 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
             self.sf.debug("resultsDomainIp empty!")
             return None
 
-        for domainiplist in resultsDomainIp:
-            for domainip in domainiplist.split("\n"):
-                domainTemp = domainip.split("|A|")[0]
-                ipTemp = domainip.split("|A|")[1]
-                if domainTemp not in self.results:
-                    self.results.append(domainTemp)
-                    self.sf.debug("Found a subdomain: " + domainTemp)
-                    evt = SpiderFootEvent("DNSINFO_SUBDOMAIN", domainTemp, self.__name__, event)
-                    self.notifyListeners(evt)
-                if ipTemp not in self.results:
-                    self.results.append(ipTemp)
-                    self.sf.debug("Found a ip: " + ipTemp)
-                    evt = SpiderFootEvent("DNSINFO_IP", ipTemp, self.__name__, event)
-                    self.notifyListeners(evt)
+        for domainip in resultsDomainIp:
+            domainTemp = domainip.split("|A|")[0]
+            ipTemp = domainip.split("|A|")[1]
+            if domainTemp not in self.results:
+                self.results.append(domainTemp)
+                self.sf.debug("Found a subdomain: " + domainTemp)
+                evt = SpiderFootEvent("DNSINFO_SUBDOMAIN", domainTemp, self.__name__, event)
+                self.notifyListeners(evt)
+            if ipTemp not in self.results:
+                self.results.append(ipTemp)
+                self.sf.debug("Found a ip: " + ipTemp)
+                evt = SpiderFootEvent("DNSINFO_IP", ipTemp, self.__name__, event)
+                self.notifyListeners(evt)
        
 
 
