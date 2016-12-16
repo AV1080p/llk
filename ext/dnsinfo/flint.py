@@ -137,10 +137,8 @@ class FlintClient(object):
             path = "%srtype/%s/" %(path, FLINT_TYPES[f_type])
         if f_netmask is not None:
             path = "%smask/%s/" %(path, str(f_netmask))
-'''
-        if options.source:
-            path = "%ssource/%s/"%(path, str(options.source))
-'''
+        #if options.source:
+            #path = "%ssource/%s/"%(path, str(options.source))
         if self.api.startswith("http://"):
             url = "%s%s" %(self.api, path)
         else:
