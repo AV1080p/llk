@@ -26,7 +26,7 @@ class sfp_subdomain(SpiderFootPlugin):
 
     # What events is this module interested in for input
     def watchedEvents(self):
-        return ["GOOGLE_SUBDOMAIN","BING_SUBDOMAIN"]
+        return ["GOOGLE_SUBDOMAIN","BING_SUBDOMAIN","DNSINFO_SUBDOMAIN"]
 
     # What events this module produces
     # This is to support the end user in selecting modules based on events

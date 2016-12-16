@@ -1,0 +1,484 @@
+#!/usr/bin/env python
+import sys
+import os
+import errno
+import socket
+import urllib2
+import hashlib
+import optparse
+import time
+from StringIO import StringIO
+from datetime import datetime
+try:
+    import json
+except ImportError:
+    import simplejson as json
+import traceback
+
+__VERSION__ = "0.1.9"
+
+__AUTHOR__ = "passivedns@360.cn" # All original credit to passivedns@360.cn. Fork changes by x123@users.noreply.github.com
+
+
+API = ""
+
+#This ID will be used as the identification by authentication system 
+API_ID = ""
+
+#This key is matched with API_ID, be used for calcuate message hash token.
+API_KEY = ""
+
+DEFAULT_CONFIG_FILE = './flint.conf'
+
+FLINT_TABLES = ['rrset', 'rdata']
+
+FLINT_SORT_FIELD = ["time_last", "time_first", "count"]
+
+FLINT_TYPES = {
+        "A" : 1,
+        "NS" : 2,
+        "MD" : 3,
+        "CNAME" : 5,
+        "SOA" : 6,
+        "PTR" : 12,
+        "MX" : 15,
+        "TXT" : 16,
+        "AAAA" : 28,
+        "SRV" : 33,
+        "DNAME" : 39,
+        "DS" : 43,
+        "RRSIG" : 46,
+        "NSEC" : 47,
+        "NSEC3" : 50
+}
+
+
+class FlintClient(object):
+
+    TIMEOUT = 30
+
+    MAX_RETRY = 5
+
+    def __init__(self, api, api_id, api_key, verbose = False):
+        self.api = api
+        self.api_id = api_id
+        self.api_key = api_key
+        self.verbose = verbose
+
+    def __call__(self, f_table, f_keyword, f_type, *args):
+        getattr(self, f_table)(f_keyword, f_type, *args)
+
+    def _do_query(self, req, max_retry=0):
+        def _safe_in_query(req):
+            try:
+                url  = req.get_full_url()
+                resp = urllib2.urlopen(req, timeout=self.TIMEOUT)
+                data = resp.read()
+                if self.verbose:
+                    self.debug_info(req, resp, data)
+                try:
+                    data = json.loads(data)
+                except Exception, e:
+                    self.panic(data)
+
+                if isinstance(data, dict) and 'err' in data:
+                    msg = data.get("msg", "") or data.get("err", "")
+                    self.panic(">>> Server Exception: %s" % msg, False)
+                    return None
+
+                return (resp, data)
+            except socket.timeout:
+                self.panic("[api timeout]: %s" %(url), False)
+                return None
+            except (urllib2.HTTPError, urllib2.URLError), e:
+                self.panic("[api error]: %s" %(url))
+                return None
+
+        retry = max_retry + 1
+        while (retry):
+            ret = _safe_in_query(req)
+            if ret is not None:
+                return ret
+
+            retry -= 1
+            print ">>> Retrying..."
+            time.sleep(1)
+            continue
+
+        return (None, None)
+
+    def debug_info(self, req, resp, data):
+        print "################"
+        print "#### REQUEST ###"
+        print "################"
+        print req.get_full_url() 
+        print req.headers
+        print
+        print "#################"
+        print "#### RESPONSE ###"
+        print "#################"
+        print resp.code
+        print resp.headers
+        #print data[:100] + "..." if len(data) > 100 else data
+        print "============================================"
+        print
+
+    def next_query(self, path):
+        url = "http://%s%s" %(self.api, path)
+        req = urllib2.Request(url)
+        req = self.setup_header(req, path)
+
+        return self._do_query(req, max_retry=self.MAX_RETRY)
+
+    def query(self, f_table, f_keyword, f_type = None, f_netmask = None):
+        path = "/api/%s/keyword/%s/" %(f_table, f_keyword)
+        if f_type is not None:
+            path = "%srtype/%s/" %(path, FLINT_TYPES[f_type])
+        if f_netmask is not None:
+            path = "%smask/%s/" %(path, str(f_netmask))
+        if options.source:
+            path = "%ssource/%s/"%(path, str(options.source))
+
+        if self.api.startswith("http://"):
+            url = "%s%s" %(self.api, path)
+        else:
+            url = "http://%s%s" %(self.api, path)
+
+        req = urllib2.Request(url)
+        req = self.setup_header(req, path)
+
+        return self._do_query(req, max_retry = self.MAX_RETRY)
+
+    def setup_header(self, req, path):
+        req.add_header('Accept', 'application/json')
+        req.add_header('User-Agent', 'netlab/flint-%s' %__VERSION__)
+        if self.api_id:
+            req.add_header('X-BashTokid', self.api_id);
+        if self.api_key:
+            token = self.genToken(path, self.api_key)
+            req.add_header('X-BashToken', token)
+        return req
+
+    def filter(self, data, sort, reverse, before, after):
+        data = sorted(data, key=lambda x:x[sort], reverse=reverse)
+        if before:
+            try:
+                before = self.time_parse(before)
+                data = filter(lambda x:x['time_last'] < before, data)
+            except ValueError, e:
+                self.panic("filter error with before: %s", before)
+        if after:
+            try:
+                after = self.time_parse(after)
+                data = filter(lambda x:x['time_first'] > after, data)
+            except ValueError,e:
+                self.panic("filter error with after: %s", after)
+        return data
+
+    def rrset(self, rrname, rrtype=None, sort="time_last", reverse=False,
+                limit=1000, jsond=False, plain=False, after=None, before=None):
+        resultsData = list()
+
+        def _dump(rrname, rrtype, data):
+            s = StringIO()
+            if not plain:
+                s.write("%s %s In rrset\n" %(rrname, rrtype or "All Type"))
+                s.write("-------\n")
+            for r in data:
+                time_first = self._timefmt(r['time_first'])
+                time_last =  self._timefmt(r['time_last'])
+                count = int(r['count'])
+                if not plain:
+                    s.write("Record times: %s -- %s\n" %(self._timefmt(r['time_first']), 
+                        self._timefmt(r['time_last'])))
+                    s.write("Count: %d\n" %(int(r['count'])))
+                rdata = r['rdata'].rstrip(";").split(";")
+                for rd in rdata:
+                    if not plain:
+                        s.write("%s\t%s\t%s\n" %(r['rrname'], r['rrtype'], rd))
+                    else:
+                        s.write("%s\t%s\t%s\t%s\t%s\t%s\n" %(time_first, time_last, count, r['rrname'], r['rrtype'], rd))
+                s.write("\n")
+            s.seek(0)
+            return s.read().strip()
+
+        def _dump_spiderfoot(rrname, rrtype, data):
+            s = StringIO()
+            for r in data:
+                time_first = self._timefmt(r['time_first'])
+                time_last =  self._timefmt(r['time_last'])
+                rdata = r['rdata'].rstrip(";").split(";")
+                for rd in rdata:
+                    if not plain:
+                        s.write("%s|%s|%s\n" %(r['rrname'], r['rrtype'], rd))
+            s.seek(0)
+            return s.read().strip()
+
+        resp, data = self.query("rrset", rrname, rrtype)
+
+        next = None
+        count = 0
+        while 1:
+            if resp:
+                next = resp.headers.get("X-NextCall", None)
+            if self.verbose:
+                print ">>> Get Next: ", next
+                print ">>> Cur Nums: ", resp.headers.get("X-BatchCnt", "unknown")
+            if data:
+                data = self.filter(data, sort, reverse, before, after)
+                if count < limit:
+                    rest = limit - count
+                    data = data[:rest]
+                    count += len(data)
+                if jsond:
+                    print json.dumps(data, sort_keys=False, indent=4, separators=(',', ': '))
+                else:
+                    resultsData.append(_dump_spiderfoot(rrname, rrtype, data))
+            if not next:
+                break
+            if count >= limit:
+                break
+            resp, data = self.next_query(next)
+        return resultsData
+
+    def rdata(self, rdata, rrtype=None, limit=1000, jsond=False, plain=False):
+
+        def _dump(rdata, rrtype, data):
+            maxwidth = 0  # find the maximum width of an rrset to prevent ugly formatting
+            for r in data:
+                if len(r['rrname']) > maxwidth:
+                    maxwidth = len(r['rrname'])
+
+            s = StringIO()
+            if not plain:
+                s.write("%s %s In rdata\n" %(rdata, rrtype or "All Type"))
+                s.write("--------\n")
+            for r in data:
+                s.write('{0:{fill}<{width}}\t{1}\t{2}'.format(r['rrname'], r['rdata'],  self._timefmt(r['time_last']), fill=' ', width=maxwidth))
+                s.write("\n")
+            s.seek(0)
+            return s.read().strip()
+
+        if self.is_cidr(rdata):
+            ip, netmask = rdata.split("/")    
+            resp, data = self.query("rdata", ip, rrtype, netmask)
+        else:
+            resp, data = self.query("rdata", rdata, rrtype)
+        
+        next = None
+        count = 0
+        while 1:
+            if resp:
+                next = resp.headers.get("X-NextCall", None)
+            if self.verbose:
+                print ">>> Get Next: ", next
+                print ">>> Cur Nums: ", resp.headers.get("X-BatchCnt", "unknown")
+            if data:
+                if count < limit:
+                    rest = limit - count
+                    data = data[:rest]
+                    count += len(data)
+                if jsond:
+                    print json.dumps(data, sort_keys=False, indent=4, separators=(',', ': '))
+                else:
+                    print _dump(rdata, rrtype, data)
+            if not next:
+                break
+            if count >= limit:
+                break
+            resp, data = self.next_query(next)
+
+    def panic(self, error, hard=True):
+        sys.stderr.write("%s\n" %error)
+        if hard: 
+            sys.exit(1)
+
+    def _timefmt(self, ts):
+        try:
+            return datetime.fromtimestamp(ts)
+        except:
+            return ""
+
+    #This function is copied from dnsdb-query
+    def time_parse(self, s):
+        try:
+            epoch = int(s)
+            return epoch
+        except ValueError:
+            pass
+
+        try:
+            epoch = int(time.mktime(time.strptime(s, '%Y-%m-%d')))
+            return epoch
+        except ValueError:
+            pass
+
+        try:
+            epoch = int(time.mktime(time.strptime(s, '%Y-%m-%d %H:%M:%S')))
+            return epoch
+        except ValueError:
+            pass
+
+        raise ValueError('Invalid time: "%s"' % s)
+
+    def is_cidr(self, cidr):
+        try:
+            ip, netmask = cidr.split("/")
+        except:
+            return False
+        if not self.is_ip(ip):
+            return False
+        if int(netmask) < 24 or int(netmask) > 31:
+            self.panic("Sorry. CIDR should between 24-31")
+        return True
+    
+    def is_ip(self, ip):
+        try:
+            socket.inet_aton(ip)
+            return True
+        except socket.error:
+            return False
+
+    def genToken(self, path, key):
+        str = "%s%s" %(path, key)
+        return self.md5(str)
+
+    def md5(self, str):
+        m = hashlib.md5()
+        m.update(str)
+        return m.hexdigest()
+
+    def parse_config():
+        config = {}
+        cfg_files = ["./ext/dnsinfo/flint.conf"]
+
+        if not cfg_files:
+            raise Exception("No config file found")
+
+        try:
+            for fname in cfg_files:
+                for line in open(fname):
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if line.startswith("#"):
+                        continue
+                    key, eq, val = line.partition('=')
+                    key = key.strip()
+                    val = val.strip().strip('"')
+                    config[key] = val
+        except:
+            raise Exception("Config file '%s' parse error", cfg_fname)
+
+        return config
+
+'''
+def runStart(f_table, f_keyword, f_type):
+    try:
+        config = parse_config()
+    except Exception, e:
+        sys.stderr.write("%s\n" %e.message)
+        sys.exit(1)
+
+    API = config.get("API", "")
+    API_ID = config.get("API_ID","")
+    API_KEY = config.get("API_KEY", "")
+
+    try:
+        flint = FlintClient(API, API_ID, API_KEY, False) 
+        return flint(f_table, f_keyword, f_type)
+    except Exception, e:
+        sys.stderr.write("Client Exception")
+        sys.stderr.write(traceback.format_exc())
+
+'''
+'''
+def usage():
+    s = StringIO()
+    s.write("Usage: %s <rrset>|<rdata> <domain>|<ip> [type] [options]\n" %sys.argv[0])
+    s.write("\t./flint rrset www.360.cn\n")
+    s.write("\t./flint rdata 101.4.60.193 A\n")
+    s.write("\t./flint rrset 360.cn -l 100\n")
+    s.write("\t./flint rrset 360.cn --sort='time_first'\n")
+    s.write("\t./flint rrset 360.cn --before='2014-10-01' --after='2014-08-01 13:12:21'\n")
+    s.seek(0)
+    return s.read()
+
+
+def parse_option():
+    parser = optparse.OptionParser(usage=usage())
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False)
+    parser.add_option("-V", "--version", action="store_true", dest="version")
+    parser.add_option('-c', '--config', dest='config', type='string',
+                    help='config file', default=DEFAULT_CONFIG_FILE)
+    parser.add_option("-j", "--json", action="store_true", dest="jsond", default=False,
+                    help="output in json format")
+    parser.add_option("-p", "--plain", action="store_true", dest="plain", default=False,
+                    help="output in plain format")
+    parser.add_option("-l", "--limit", action="store", type="int", default=1000, dest="limit",
+                    help="limit number of results. [default: %default]")
+    parser.add_option("-s", "--sort", action="store", type="string", default="time_last", dest="sort",
+                    help="|".join(FLINT_SORT_FIELD)+" [default: %default]")
+    parser.add_option("-R", "--reverse", dest="reverse", action="store_false", default=True,
+                    help="reverse sort")
+
+    parser.add_option("-S", "--source", dest="source", action="store", default="", help="data sourc3")
+
+    parser.add_option("", "--before", dest="before", type="string", action="store", 
+                    help="only output results seen before this time")
+    parser.add_option("", "--after", dest="after", type="string", action="store", 
+                    help="only output results seen after this time")
+    return parser
+
+
+if __name__ == "__main__":
+
+    global options, args
+    parser = parse_option()
+    options, args = parser.parse_args()
+
+    if options.version:
+        print "flint %s" %__VERSION__
+        sys.exit(0)
+
+    if len(args) <2:
+        parser.print_help()
+        sys.exit(1)
+
+    f_table = args[0]
+    if f_table not in FLINT_TABLES:
+       sys.stderr.write("Table must be in %s\n" %("|".join(FLINT_TABLES)))
+       sys.exit(1)
+
+    f_keyword = args[1]
+    
+    f_type = args[2] if len(args)>2 else None
+    if f_type is not None:
+       f_type = f_type.upper()
+       if f_type not in FLINT_TYPES.keys():
+           sys.stderr.write("Type must be in %s\n" %("|".join(FLINT_TYPES)))
+           sys.exit(1)
+
+    if options.sort not in FLINT_SORT_FIELD:
+        sys.stderr.write("Sort field must be in %s\n" %("|".join(FLINT_SORT_FIELD)))
+        sys.exit(1)
+
+    try:
+        config = parse_config(options.config)
+    except Exception, e:
+        sys.stderr.write("%s\n" %e.message)
+        sys.exit(1)
+
+    API = API or config.get("API", "")
+    API_ID = API_ID or config.get("API_ID","")
+    API_KEY = API_KEY or config.get("API_KEY", "")
+
+    try:
+        flint = FlintClient(API, API_ID, API_KEY, options.verbose) 
+        flint(f_table, f_keyword, f_type)
+    except KeyboardInterrupt, e:
+        print ">>> User Interrupt."
+    except Exception, e:
+        sys.stderr.write("Client Exception")
+        sys.stderr.write(traceback.format_exc())
+'''

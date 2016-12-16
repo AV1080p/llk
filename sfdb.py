@@ -96,6 +96,8 @@ class SpiderFootDb:
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('GOOGLE_SUBDOMAIN', 'google subdomain', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('BING_SUBDOMAIN', 'bing subdomain', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('YAHOO_SUBDOMAIN', 'yahoo subdomain', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DNSINFO_SUBDOMAIN', 'dnsinfo subdomain', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DNSINFO_IP', 'dnsinfo ip', 0, 'ENTITY')",
     ]
 
     def __init__(self, opts):
