@@ -74,13 +74,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
             self.results.append(domain)
 
         f_keyword = '*.' + domain
-
-        try:
-            resultsDomainIp = flint("rrset", f_keyword, "A")
-        except Exception, e:
-            sys.stderr.write("Client Exception")
-            sys.stderr.write(traceback.format_exc())
-
+        resultsDomainIp = flint("rrset", f_keyword, "A")
         for domainiplist in resultsDomainIp:
             for domainip in domainiplist.split("\n"):
                 domainTemp = domainip.split("|A|")[0]
