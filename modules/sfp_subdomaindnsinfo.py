@@ -47,7 +47,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
                     val = val.strip().strip('"')
                     config[key] = val
         except:
-            raise Exception("Config file '%s' parse error", cfg_fname)
+            raise Exception("Config file '%s' parse error", fname)
         API = self.config.get("API", "")
         API_ID = self.config.get("API_ID","")
         API_KEY = self.config.get("API_KEY", "")
