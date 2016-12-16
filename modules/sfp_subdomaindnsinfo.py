@@ -33,7 +33,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
         self.sf = sfc
         self.results = list()
         self.config = {}
-        for line in open('~/flint.conf','r'):
+        for line in open('/root/flint.conf'):
             line = line.strip()
             if not line:
                 continue
