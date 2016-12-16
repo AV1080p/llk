@@ -33,21 +33,16 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
         self.sf = sfc
         self.results = list()
         self.config = {}
-        cfg_files = ["~/flint.conf"]
-        try:
-            for fname in cfg_files:
-                for line in open(fname):
-                    line = line.strip()
-                    if not line:
-                        continue
-                    if line.startswith("#"):
-                        continue
-                    key, eq, val = line.partition('=')
-                    key = key.strip()
-                    val = val.strip().strip('"')
-                    config[key] = val
-        except:
-            raise Exception("Config file '%s' parse error", fname)
+        for line in open("~/flint.conf"):
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("#"):
+                continue
+            key, eq, val = line.partition('=')
+            key = key.strip()
+            val = val.strip().strip('"')
+            self.config[key] = val
         API = self.config.get("API", "")
         API_ID = self.config.get("API_ID","")
         API_KEY = self.config.get("API_KEY", "")
