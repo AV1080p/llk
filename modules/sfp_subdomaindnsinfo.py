@@ -33,7 +33,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
         self.sf = sfc
         self.results = list()
         self.config = {}
-        cfg_files = ["./ext/dnsinfo/flint.conf"]
+        cfg_files = ["~/flint.conf"]
         try:
             for fname in cfg_files:
                 for line in open(fname):
