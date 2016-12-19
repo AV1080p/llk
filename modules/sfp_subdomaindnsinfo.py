@@ -95,7 +95,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
                 self.sf.debug("Found a ip: " + ipTemp)
                 evt = SpiderFootEvent("DNSINFO_IP", ipTemp, self.__name__, event)
                 self.notifyListeners(evt)
-    def fliterDomain(subdomain):
+    def fliterDomain(self, subdomain):
         az19 = "abcdefghijklmnopqrstuvwxyz1234567890"
         if az19.find(subdomain[0]) == -1:
             return False
