@@ -99,6 +99,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
         az19 = "abcdefghijklmnopqrstuvwxyz1234567890"
         if az19.find(subdomain[0]) == -1:
             return False
+        return True
 
 '''
         # Sites hosted on the domain
