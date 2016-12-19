@@ -69,7 +69,7 @@ class FlintClient(object):
 
     def __call__(self, f_table, f_keyword, f_type, *args):
         getattr(self, f_table)(f_keyword, f_type, *args)
-        
+
     def getresultsData(self):
         return self.resultsData
 
@@ -231,10 +231,10 @@ class FlintClient(object):
                 print ">>> Cur Nums: ", resp.headers.get("X-BatchCnt", "unknown")
             if data:
                 data = self.filter(data, sort, reverse, before, after)
-                if count < limit:
-                    rest = limit - count
-                    data = data[:rest]
-                    count += len(data)
+                #if count < limit:
+                #    rest = limit - count
+                #    data = data[:rest]
+                #    count += len(data)
                 if jsond:
                     print json.dumps(data, sort_keys=False, indent=4, separators=(',', ': '))
                 else:
@@ -243,8 +243,8 @@ class FlintClient(object):
                         self.resultsData.append(tt)
             if not next:
                 break
-            if count >= limit:
-                break
+            #if count >= limit:
+                #break
             resp, data = self.next_query(next)
         #for tt in resultsData:
         #    print tt

@@ -82,6 +82,8 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
 
         for domainip in resultsDomainIp:
             domainTemp = domainip.split("|A|")[0]
+            if not fliterDomain(domainTemp):
+                continue
             ipTemp = domainip.split("|A|")[1]
             if domainTemp not in self.results:
                 self.results.append(domainTemp)
@@ -93,8 +95,10 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
                 self.sf.debug("Found a ip: " + ipTemp)
                 evt = SpiderFootEvent("DNSINFO_IP", ipTemp, self.__name__, event)
                 self.notifyListeners(evt)
-       
-
+    def fliterDomain(subdomain):
+        az19 = "abcdefghijklmnopqrstuvwxyz1234567890"
+        if az19.find(subdomain[0]) == -1:
+            return False
 
 '''
         # Sites hosted on the domain
