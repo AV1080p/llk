@@ -51,7 +51,7 @@ class sfp_ipaddress(SpiderFootPlugin):
         elif eventData.split('.')[0] == '172':
             evt = SpiderFootEvent("IP_ADDRESS_LAN", eventData, self.__name__, event)
             self.notifyListeners(evt)
-        elif eventData.split('.')[0] == '192' and eventData.split('.')[1] = '168' :
+        elif eventData.split('.')[0] == '192' and eventData.split('.')[1] == '168' :
             evt = SpiderFootEvent("IP_ADDRESS_LAN", eventData, self.__name__, event)
             self.notifyListeners(evt)
         else:
