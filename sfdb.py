@@ -98,6 +98,9 @@ class SpiderFootDb:
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('YAHOO_SUBDOMAIN', 'yahoo subdomain', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DNSINFO_SUBDOMAIN', 'dnsinfo subdomain', 0, 'ENTITY')",
         "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('DNSINFO_IP', 'dnsinfo ip', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('TCP_PORT_OPEN', 'port open', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('TCP_PORT_OPEN_BANNER', 'port open banner', 0, 'ENTITY')",
+        "INSERT INTO tbl_event_types (event, event_descr, event_raw, event_type) VALUES ('IP_ADDRESS_LAN', 'ip address lan', 0, 'ENTITY')",
     ]
 
     def __init__(self, opts):
