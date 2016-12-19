@@ -82,7 +82,7 @@ class sfp_subdomaindnsinfo(SpiderFootPlugin):
 
         for domainip in resultsDomainIp:
             domainTemp = domainip.split("|A|")[0]
-            if not fliterDomain(domainTemp):
+            if not self.fliterDomain(domainTemp):
                 continue
             ipTemp = domainip.split("|A|")[1]
             if domainTemp not in self.results:
